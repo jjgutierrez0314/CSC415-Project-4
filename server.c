@@ -32,7 +32,7 @@
 #define BACKLOG 10 // how many pending connections queue will hold
 
 #define MAXCHARS 5000
-
+int countWords(char *);
 struct FileInfo
 {
   char *name;   /* name of file */
@@ -40,6 +40,12 @@ struct FileInfo
   int numWords; /* number of words in file */
   int numChars; /* number of characters in file */
 } fileInfo;
+
+struct BufferInfo
+{
+  char *name;
+  FILE *fp;
+} BufferInfo;
 
 int main(void)
 {
@@ -136,10 +142,10 @@ int main(void)
     if (!fork())
     {                /* create child to handle new client */
       close(sockfd); /* child doesn't need the listener */
-      char s[80];
+      char s[MAXCHARS];
       /* read string from client */
-      int numBytes = read(new_fd, fp, 80);
-      if (numBytes > 80)
+      int numBytes = read(new_fd, s, MAXCHARS);
+      if (numBytes > MAXCHARS)
       {
         perror("read");
         close(new_fd);
@@ -147,14 +153,10 @@ int main(void)
       }
       int i = 0;
       /* Compute counts */
-      info[i].name = (char *)malloc(MAXCHARS * sizeof(char));
-      strncpy(info[i].name, argv[i + 1], MAXCHARS);
-      info[i].numLines = 0;
-      info[i].numWords = 0;
-      info[i].numChars = 0;
 
-      numBytes = write(new_fd, s, strlen(s) + 1);
-      if (numBytes != strlen(s) + 1)
+
+      numBytes = write(new_fd, s, MAXCHARS);
+      if (numBytes != MAXCHARS)
       {
         perror("write");
         close(new_fd);

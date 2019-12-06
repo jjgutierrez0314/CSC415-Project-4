@@ -32,6 +32,12 @@
 
 #define MAXDATASIZE 5000 // max number of bytes we can get at once
 
+// struct BufferInfo
+// {
+//   char *name;
+//   FILE *fp;
+// } BufferInfo;
+
 int main(int argc, char *argv[])
 {
   int sockfd, numbytes;
@@ -93,8 +99,25 @@ int main(int argc, char *argv[])
 
   /* send message to server */
   char *mess = argv[2];
+  char source[MAXDATASIZE + 1];
   fp = fopen(mess, "r");
-  numbytes = write(sockfd, fp, MAXDATASIZE);
+  if (fp != NULL)
+  {
+    size_t newLen = fread(source, sizeof(char), MAXDATASIZE, fp);
+    if (ferror(fp) != 0)
+    {
+      fputs("Error reading file", stderr);
+    }
+    else
+    {
+      source[newLen++] = '\0'; /* Just to be safe. */
+    }
+    fclose(fp);
+  }
+  // struct BufferInfo *sendInfo;
+  // sendInfo = (struct BufferInfo *)malloc(sizeof(struct BufferInfo));
+
+  numbytes = write(sockfd, source, MAXDATASIZE);
   // numbytes = write(sockfd, fp, strlen(fp) + 1);
   if (numbytes != MAXDATASIZE)
   {
@@ -112,5 +135,3 @@ int main(int argc, char *argv[])
   close(sockfd);
   return 0;
 }
-
-
