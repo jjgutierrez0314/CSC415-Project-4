@@ -25,10 +25,21 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <ctype.h>
 
 #define PORT "5001" // the port users will be connecting to
 
 #define BACKLOG 10 // how many pending connections queue will hold
+
+#define MAXCHARS 5000
+
+struct FileInfo
+{
+  char *name;   /* name of file */
+  int numLines; /* number of lines in file */
+  int numWords; /* number of words in file */
+  int numChars; /* number of characters in file */
+} fileInfo;
 
 int main(void)
 {
@@ -39,6 +50,14 @@ int main(void)
   int yes = 1;
   char s[INET_ADDRSTRLEN];
   int rv;
+
+  //added stuff from fileStats.c
+  FILE *fp;
+  struct FileInfo *info;                        /* array of counts for each file */
+  int numLines = 0, numWords = 0, numChars = 0; /* total counts */
+  char inString[MAXCHARS];
+  char *rs;
+  info = (struct FileInfo *)malloc(sizeof(struct FileInfo));
 
   /* get info for self, to set up socket */
   memset(&hints, 0, sizeof hints);
@@ -119,17 +138,21 @@ int main(void)
       close(sockfd); /* child doesn't need the listener */
       char s[80];
       /* read string from client */
-      int numBytes = read(new_fd, s, 80);
+      int numBytes = read(new_fd, fp, 80);
       if (numBytes > 80)
       {
         perror("read");
         close(new_fd);
         exit(0);
       }
-      int i, j;
+      int i = 0;
       /* Compute counts */
-      printf("String is: %s\n", s);
-      
+      info[i].name = (char *)malloc(MAXCHARS * sizeof(char));
+      strncpy(info[i].name, argv[i + 1], MAXCHARS);
+      info[i].numLines = 0;
+      info[i].numWords = 0;
+      info[i].numChars = 0;
+
       numBytes = write(new_fd, s, strlen(s) + 1);
       if (numBytes != strlen(s) + 1)
       {
@@ -144,4 +167,25 @@ int main(void)
   }
 
   return 0;
+}
+
+int countWords(char *inS)
+{
+  char *token;
+  int numTokens = 0;
+  int i = 0;
+
+  for (i = 1; i < strlen(inS); i++)
+  {
+    if ((isalnum(inS[i - 1]) || ispunct(inS[i - 1])) && (inS[i] == ' '))
+    {
+      numTokens++;
+    }
+  }
+
+  if (isalnum(inS[strlen(inS) - 2]) || ispunct(inS[strlen(inS) - 2]))
+  {
+    numTokens++;
+  }
+  return numTokens;
 }
