@@ -32,6 +32,9 @@
 #define BACKLOG 10 // how many pending connections queue will hold
 
 #define MAXCHARS 5000
+#define OUT 0
+#define IN 1
+
 int countWords(char *);
 struct FileInfo
 {
@@ -151,9 +154,22 @@ int main(void)
         close(new_fd);
         exit(0);
       }
-      int i = 0;
       /* Compute counts */
+      printf("%s\n", s);
 
+      for(int i = 0; i < strlen(s); i++) {
+        if(s[i] == '\n'){
+          numLines++;
+        }
+      }
+      numWords = countWords(s) + 1;
+      numChars = strlen(s) - numLines;
+
+
+
+
+      printf("%d lines, %d words, %d characters", numLines,numWords,numChars);
+      
 
       numBytes = write(new_fd, s, MAXCHARS);
       if (numBytes != MAXCHARS)
