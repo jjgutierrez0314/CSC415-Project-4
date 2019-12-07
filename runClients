@@ -1,0 +1,4 @@
+./client localhost Evenson.txt &
+./client localhost Pessoa.txt &
+./client localhost Davis.txt &
+./client localhost Oliver.txt

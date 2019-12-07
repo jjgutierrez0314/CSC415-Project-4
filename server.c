@@ -155,7 +155,7 @@ int main(void)
         exit(0);
       }
       /* Compute counts */
-      printf("%s\n", s);
+      // printf("%s\n", s);
 
       for(int i = 0; i < strlen(s); i++) {
         if(s[i] == '\n'){
@@ -167,8 +167,8 @@ int main(void)
 
 
 
-
-      printf("%d lines, %d words, %d characters", numLines,numWords,numChars);
+      printf("%d lines, %d words, %d characters\n", numLines,numWords,numChars);
+      s[MAXCHARS] = sprintf(s, "%d lines, %d words, %d characters\n", numLines,numWords,numChars);
       
 
       numBytes = write(new_fd, s, MAXCHARS);

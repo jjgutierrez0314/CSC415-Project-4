@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
   numbytes = read(sockfd, buf, MAXDATASIZE - 1);
 
   buf[numbytes] = '\0';
-  printf("client: received '%s'\n", buf);
+  printf("client: received %s: %s", mess,buf);
 
   close(sockfd);
   return 0;
